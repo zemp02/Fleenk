@@ -1,0 +1,180 @@
+{block title}Branches{/block}
+{block content}
+
+
+
+
+
+    <!-- CONTENT -->
+    <div class="container-fluid">
+
+        <div class="table-responsive">
+            <table id="table" class="table" data-unique-id="BranchCode"
+                   data-detail-view-by-click="true"
+                   data-search="true"
+                   data-visible-search="true"
+                   {if $expand}data-detail-view="true"{/if}>
+                <thead class="thead-dark">
+                </thead>
+            </table>
+        </div>
+
+    </div>
+{/block}
+{block bonusScripts}
+    <script>
+        let $table = $('#table')
+
+        /**
+         * Function that creates primary table
+         */
+        function buildTable($el, cells, rows, depth) {
+            let columns = [];
+            let rowData = [];
+
+
+            /**
+             * If there are any rows in JSON adds them to data array.
+             */
+            {ifset $rows}
+
+            {for $i = 0; $i < $rowNumber; $i++}
+            row = JSON.parse({$rows[$i]});
+            rowData.push(row);
+            {/for}
+
+            {/ifset}
+
+            /**
+             * Sets up columns for primary row
+             */
+            {for $i = 0;$i < $columnNumber;$i++}
+            columns.push(
+                JSON.parse({$columns[$i]})
+            );
+            {/for}
+
+
+            /**
+             * Creates primary table
+             */
+            $el.bootstrapTable({
+                columns: columns,
+                data: rowData
+                {if $expand}
+                , detailView: cells > 1,
+                onExpandRow: function (index, rows, $detail) {
+                    expandTable($detail,  index, rowData)
+                }
+                {/if}
+            });
+
+            /**
+             * Takes care of change state form in each row.
+             */
+            $(document).on('click', '.btn-change-state', function (e) {
+                e.stopPropagation();
+
+                let $head = $(this).closest('tbody');
+                let branchCode = $(this).attr('data-parent');
+                let button = $(this);
+                let role = {$role};
+
+                let $optSelect = $head.find('.opt-select-state'); // opt-select-state
+                let optSelectVal = $optSelect.val();
+                if (optSelectVal == null) {
+                    optSelectVal = $(this).attr('data-new-state');
+
+                }
+
+                let res = confirm("Opravdu chcete změnit stav?");
+
+                if (!res) {
+                    return;
+                }
+                if(role==='Admin'||
+                    (role==='Technik'&&(optSelectVal==='In use'||optSelectVal==='Collected'))||
+                    (role==='Klient'&&(optSelectVal==='Ready for Pickup'))) {
+                    $.nette.ajax({
+                        type: "GET",
+                        url: '?do=changeState',
+                        data: {
+                            'branchCode': branchCode,
+                            'newState': optSelectVal
+                        },
+                        success: function (data) {
+
+                            if (data.newState) {
+                                $el.bootstrapTable('updateCellByUniqueId', {
+                                    id: data.branch,
+                                    field: 'State',
+                                    value: data.newState
+
+                                })
+                            }
+
+                            if (data.newerState) {
+
+                                rowData.find((object) => {
+                                        let iFoundIt = object.BranchCode == branchCode;
+                                        if (iFoundIt) {
+
+                                            let oldButton = object.button;
+                                            let newButton = oldButton.replace(data.newState, data.newerState);
+                                            object.button = newButton;
+                                            {if $role == "Klient"}
+                                            $el.bootstrapTable('updateCellByUniqueId', {
+                                                id: data.branch,
+                                                field: 'button',
+                                                value: newButton
+
+                                            });
+                                            {/if}
+                                            {if $role == "Admin"}
+                                            let oldSelect = object.select;
+                                            let emptySelect = oldSelect.replace('selected', '');
+                                            let newSelect = emptySelect.replace('<option  >' + data.newerState, '<option selected >' + data.newerState);
+                                            object.select = newSelect;
+
+                                            {/if}
+
+                                        }
+                                        return iFoundIt;
+                                    }
+                                );
+
+                            }
+                        }
+                    });
+                }
+            })
+            ;
+        }
+
+        /**
+         * Function for expanding row and creating new table.
+         * @param $detail - Table the function is working with.
+         * @param index - Number of row that is expanded.
+         * @param oldData - Data from old table.
+         */
+        function expandTable($detail,index, oldData) {
+            $el = $detail.html('<table></table>').find('table');
+            let columns = [];
+            let data = [];
+            data.push(oldData[index]);
+            {for $i = $columnNumber;$i < $columnNumber + $secondaryColumnNumber;$i++}
+            columns.push(
+                JSON.parse({$columns[$i]})
+            )
+            {/for}
+            $el.bootstrapTable({
+                columns: columns,
+                data: data
+            })
+        }
+
+        $(function () {
+            buildTable($table, {$columnNumber}, {$rowNumber}, 1)
+        })
+    </script>
+{/block}

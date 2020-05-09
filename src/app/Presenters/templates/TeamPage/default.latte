@@ -1,0 +1,208 @@
+{block title}TeamPage{/block}
+{block content}
+    <div class="container col">
+        <div class="row">
+            <div class="col-md-6 ">
+                <div class="row pb-4">
+                    <h3>Team name: {$TeamName}</h3>
+                </div>
+                <div class="row pb-4">
+                    <h6>Team leader name: {$TeamLeaderName}</h6>
+                </div>
+                <div class="row pb-4">
+                    <h6>Team leader phone: {$TeamLeaderPhone}</h6>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-6  pt-4">
+                <div class="row">
+                    <div class="col">
+                        <!-- První Form -->
+                        <form n:name=memberForm class=" mb-3 row">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col input-group ">
+                                        <input n:name=member class="form-control" placeholder="New member's email: ">
+                                        <div class="input-group-append">
+                                            <input n:name=add class="btn btn-primary">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <ul class="errors row" n:if="$form->hasErrors()">
+                                            <li n:foreach="$form->errors as $error">{$error}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Druhý Form -->
+                <div class="row">
+                    <div class="col">
+                        <form n:name=branchForm class="mb-3 row">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col input-group ">
+                                        <input n:name=branch class="form-control " placeholder="Code of branch: ">
+                                        <div class="input-group-append">
+                                            <input n:name=add class="btn btn-primary">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <ul class="errors row" n:if="$form->hasErrors()">
+                                            <li n:foreach="$form->errors as $error">{$error}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>Members:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="members" class="table">
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>Branches:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="branches" class="table">
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{/block}
+{block bonusScripts}
+    <script>
+        let $members = $('#members')
+        let $branches = $('#branches')
+
+        /**
+         * Function that creates primary table
+         */
+        function buildTable($el, input) {
+            let columns = [];
+            let rowData = [];
+            let allColumns = [];
+            let row = [];
+            let columnNumber;
+
+            if (input === 'member') {
+                allColumns ={$memberColumns};
+                columnNumber ={$memberColumnNumber};
+                row = {$memberRows}
+            } else if (input === 'branch') {
+                allColumns ={$branchColumns};
+                columnNumber ={$branchColumnNumber};
+                row = {$branchRows};
+            }
+
+
+            /**
+             * If there are any rows in JSON adds them to data array.
+             */
+
+            row.forEach(function (item) {
+                rowData.push(JSON.parse(item));
+            });
+
+
+            /**
+             * Sets up columns for primary row
+             */
+
+            for (i = 0; i < columnNumber; i++) {
+                columns.push(
+                    JSON.parse(allColumns[i])
+                )
+            }
+            /**
+             * Creates primary table
+             */
+            $el.bootstrapTable({
+                columns: columns,
+                data: rowData
+            });
+
+            /**
+             * Takes care of button in each row.
+             */
+            if (input == 'member') {
+                $(document).on('click', '.btn-remove-member', handleRemoval);
+            } else if (input == 'branch') {
+                $(document).on('click', '.btn-remove-branch', handleRemoval);
+            }
+
+            function handleRemoval(e) {
+                e.stopPropagation();
+
+                let id = $(this).attr('data-id');
+                let index = $(this).closest('tr').data('index');
+
+                let res = confirm("Opravdu chcete změnit stav?");
+
+                if (!res) {
+                    return;
+                }
+
+                $.nette.ajax({
+                    type: "GET",
+                    url: '?do=removeRow',
+                    data: {
+                        'id': id,
+                        'input': input,
+                        'teamId': {$TeamId}
+
+                    },
+                    success: function (data) {
+                        if (input == 'member') {
+                            $el.bootstrapTable('remove', { field: 'MemberEmail', values: rowData[index].MemberEmail});
+                        } else if (input == 'branch') {
+                            $el.bootstrapTable('remove', {
+                                field: 'BranchCode',
+                                values: rowData[index].BranchCode.toString()
+                            });
+                        }
+                    }
+
+                });
+            }
+        }
+
+
+        $(function () {
+            buildTable($members, 'member');
+            buildTable($branches, 'branch');
+        })
+    </script>
+{/block}

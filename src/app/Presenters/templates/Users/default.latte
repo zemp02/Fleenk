@@ -1,0 +1,214 @@
+{block title}Users{/block}
+{block content}
+    <div class="container col">
+        <div class="row justify-content-center">
+            <div class="col-md-6  pt-4 ">
+                <div class="row justify-content-center">
+                    <h3 id="roleName">Technician</h3>
+                </div>
+                <div class="row">
+                    <form n:name=technicianForm>
+
+                        <ul class="errors" n:if="$form->hasErrors()">
+                            <li n:foreach="$form->errors as $error">{$error}</li>
+                        </ul>
+                        <div class="row">
+                            <div class="col">
+                                <label>First name:</label>
+                                <input n:name="firstName" type="text" class="form-control d-inline" id="firstName"
+                                                          required>
+                            </div>
+                            <div class="col">
+                                <label>Last name:</label>
+                                <input n:name="lastName" type="text" class="form-control d-inline" id="lastName"
+                                                         required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label>Email:</label>
+                                <input n:name="email" type="text" class="form-control d-inline" id="email" required>
+                            </div>
+                            <div class="col">
+                                <label>Phone:</label>
+                                <input n:name="phone" type="text" class="form-control d-inline" id="phone" required>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center mt-3">
+                            <input n:name="create" type="submit" class="btn btn-primary btn-block m-3">
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>Technicians:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="technician" class="table" data-mobile-responsive="true">
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>Clients:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="clients" class="table">
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{/block}
+{block bonusScripts}
+    <script>
+        let $technician = $('#technician');
+        let $client = $('#clients');
+
+
+        /**
+         * Builds bootstrap-table
+         * @param $el - table to work with.
+         * @param input - defines type of table.
+         */
+        function buildTable($el, input) {
+            let columns = [];
+            let rowData = [];
+            let allColumns = [];
+            let row = [];
+            let columnNumber;
+
+            if (input === 'technician') {
+                allColumns ={$technicianColumns};
+                columnNumber ={$technicianColumnNumber};
+                row = {$technicianRows};
+            } else if (input === 'client') {
+                allColumns ={$clientColumns};
+                columnNumber ={$clientColumnNumber};
+                row = {$clientRows};
+            }
+
+
+            /**
+             * If there are any rows in JSON adds them to data array.
+             */
+
+            row.forEach(function (item) {
+                rowData.push(JSON.parse(item));
+
+            });
+
+            /**
+             * Sets up columns for primary row
+             */
+
+            for (i = 0; i < columnNumber; i++) {
+                columns.push(
+                    JSON.parse(allColumns[i])
+                )
+            }
+            /**
+             * Creates primary table
+             */
+            $el.bootstrapTable({
+                columns: columns,
+                data: rowData
+            });
+
+            /**
+             * Takes care of button in each row.
+             */
+
+
+        }
+
+        /**
+         * Function for buttons removing technician.
+         * @param e - click event of button.
+         */
+        function handleRemoval(e) {
+            e.stopPropagation();
+
+            let id = $(this).attr('data-id');
+            let index = $(this).closest('tr').data('index');
+
+            let $el = $(this).closest('table');
+            let email = $el.bootstrapTable('getData')[index].technicianEmail;
+
+            let res = confirm("Opravdu chcete vymazat tohoto uživatele?");
+
+            if (!res) {
+                return;
+            }
+
+            $.nette.ajax({
+                type: "GET",
+                url: '?do=removeRow',
+                data: {
+                    'id': id,
+
+                },
+                success: function (data) {
+                    $el.bootstrapTable('remove', {
+                        field: 'technicianEmail',
+                        values: email
+                    });
+
+                }
+
+            });
+        }
+
+        /**
+         * Function for buttons reseting passwords.
+         * @param e - click event of button.
+         */
+        function handleReset(e) {
+            e.stopPropagation();
+
+            let id = $(this).attr('data-id');
+            let res = confirm("Opravdu chcete resetovat heslo tohoto uživatele?");
+
+            if (!res) {
+                return;
+            }
+
+            $.nette.ajax({
+                type: "GET",
+                url: '?do=resetPassword',
+                data: {
+                    'id': id,
+
+                },
+                success: function (data) {
+                }
+
+            });
+        }
+
+        $(function () {
+            buildTable($technician, 'technician');
+            buildTable($client, 'client');
+            $(document).on('click', '.btn-remove-technician', handleRemoval);
+            $(document).on('click', '.btn-change-password', handleReset);
+        })
+    </script>
+{/block}

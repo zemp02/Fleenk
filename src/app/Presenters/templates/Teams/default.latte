@@ -1,0 +1,274 @@
+{block title}Teams{/block}
+{block content}
+
+
+
+
+
+    <!-- CONTENT -->
+    <div class="container-fluid">
+
+        <div class="row justify-content-center">
+            <div class="col-md-6  pt-4 ">
+                <div class="row justify-content-center mb-4">
+                    <h3 id="roleName">New Team:</h3>
+                </div>
+                <div class="row">
+                    <form n:name=teamForm>
+
+                        <ul class="errors" n:if="$form->hasErrors()">
+                            <li n:foreach="$form->errors as $error">{$error}</li>
+                        </ul>
+                        <div class="row">
+                            <div class="col">
+                                <label n:name="teamName">Team name:</label>
+                                <input n:name="teamName" type="text" class="form-control d-inline" required>
+                            </div>
+                            <div class="col">
+                                <label n:name="teamLeaderEmail">Team leader email:</label>
+                                <input n:name="teamLeaderEmail" type="text" class="form-control d-inline" required>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center mt-3">
+                            <input n:name="create" type="submit" class="btn btn-primary btn-block m-3">
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="table" class="table" data-detail-view-icon="false" data-detail-view="true" data-search="true">
+                <thead class="thead-dark">
+                </thead>
+            </table>
+        </div>
+
+
+    </div>
+{/block}
+{block bonusScripts}
+    <script>
+        let $table = $('#table')
+
+        /**
+         * Function that creates primary table
+         */
+        function buildTable($el, cells, rows, depth) {
+            let columns = [];
+            let data = [];
+            let rowData = [];
+            let input = [];
+
+
+            /**
+             * If there are any rows in JSON adds them to data array.
+             */
+            {ifset $rows}
+
+            {for $i = 0; $i < $rowNumber; $i++}
+            row = JSON.parse({$rows[$i]})
+            //data.push(row);
+            rowData.push(row);
+            input.push('none');
+            {/for}
+
+            {/ifset}
+
+            /**
+             * Sets up columns for primary row
+             */
+            {for $i = 0;$i < $columnNumber;$i++}
+            columns.push(
+                JSON.parse({$columns[$i]})
+            )
+            {/for}
+
+
+            /**
+             * Creates primary table
+             */
+            $el.bootstrapTable({
+                columns: columns,
+                data: rowData
+                , detailView: cells > 1,
+                onExpandRow: function (index, rows, $detail) {
+                    expandTable($detail, index, rowData, input[index])
+                }
+            });
+
+            $(document).on('click', '#table tr[data-has-detail-view="true"]', function () {
+                let $row = $(this);
+                let index = $row.data('index');
+                $el.bootstrapTable('collapseRow',index);
+                input[index]='none';
+            });
+
+            $(document).on('click', '.btn-branches', function (e) {
+                e.stopPropagation();
+
+                let index;
+                index = $(this).closest('tr').data('index');
+                if (input[index] === 'branch') {
+                    input[index] = 'none';
+                    $el.bootstrapTable('collapseRow', index);
+                } else if (input[index] === 'none') {
+                    input[index] = 'branch';
+                    $el.bootstrapTable('expandRow', index);
+                } else if (input[index] === 'member') {
+                    $el.bootstrapTable('collapseRow', index);
+                    input[index] = 'branch';
+                    $el.bootstrapTable('expandRow', index);
+                }
+
+            });
+
+            $(document).on('click', '.btn-members', function (e) {
+                e.stopPropagation();
+
+                let index;
+                index = $(this).closest('tr').data('index');
+                if (input[index] === 'member') {
+                    input[index] = 'none';
+                    $el.bootstrapTable('collapseRow', index);
+                } else if (input[index] === 'none') {
+                    input[index] = 'member';
+                    $el.bootstrapTable('expandRow', index);
+                } else if (input[index] === 'branch') {
+                    $el.bootstrapTable('collapseRow', index);
+                    input[index] = 'member';
+                    $el.bootstrapTable('expandRow', index);
+                }
+
+            });
+            /**
+             * Takes care of change state form in each row.
+             */
+            $(document).on('click', '.btn-change-state', function (e) {
+                e.stopPropagation();
+
+                let $head = $(this).closest('tbody');
+                let branchCode = $(this).attr('data-parent');
+                let button = $(this);
+                let $optSelect = $head.find('.opt-select-state'); // opt-select-state
+                let optSelectVal = $optSelect.val();
+                if (optSelectVal == null) {
+                    optSelectVal = $(this).attr('data-new-state');
+
+                }
+
+                let res = confirm("Opravdu chcete změnit stav?");
+
+                if (!res) {
+                    return;
+                }
+
+                $.nette.ajax({
+                    type: "GET",
+                    url: '?do=changeState',
+                    data: {
+                        'branchCode': branchCode,
+                        'newState': optSelectVal
+                    },
+                    success: function (data) {
+
+                        if (data.newState) {
+                            $el.bootstrapTable('updateCellByUniqueId', {
+                                id: data.branch,
+                                field: 'State',
+                                value: data.newState
+
+                            })
+                        }
+
+                        if (data.newerState) {
+
+                            rowData.find((object) => {
+                                    let iFoundIt = object.BranchCode == branchCode;
+                                    if (iFoundIt) {
+
+                                        let oldButton = object.button;
+                                        let newButton = oldButton.replace(data.newState, data.newerState);
+                                        object.button = newButton;
+                                        $el.bootstrapTable('updateCellByUniqueId', {
+                                            id: data.branch,
+                                            field: 'button',
+                                            value: newButton
+
+                                        })
+
+                                    }
+                                    return iFoundIt;
+                                }
+                            );
+
+                        }
+                    }
+                })
+                ;
+            })
+            ;
+        }
+
+
+        /**
+         * Function for expanding row and creating new table.
+         * @param $detail - Table the function is working with.
+         * @param index - Number of row that is expanded.
+         * @param oldData - Data from old table.
+         * @param input - Type of input.
+         */
+        function expandTable($detail, index, oldData, input) {
+            $el = $detail.html('<table></table>').find('table');
+            let allColumns = [];
+            let columns = [];
+            let data = [];
+            let subrow = [];
+            let columnNumber = {$columnNumber};
+            let secondaryColumnNumber = {$secondaryColumnNumber};
+            let tertiaryColumnNumber = {$tertiaryColumnNumber};
+            let start;
+            let end;
+
+            allColumns={$columns}
+                if (input==='branch') {
+                    subrow = (oldData[index].BranchesSubrow);
+                }else if (input ==='member'){
+                    subrow = (oldData[index].MembersSubrow);
+                }
+
+            subrow.forEach(function (item) {
+                data.push(JSON.parse(item));
+            });
+
+            if (input==='branch'){
+                start = columnNumber;
+                end = columnNumber+secondaryColumnNumber;
+            }else if (input ==='member'){
+                start=columnNumber+secondaryColumnNumber;
+                end= columnNumber+secondaryColumnNumber+tertiaryColumnNumber;
+            }
+
+            for (i = start; i < end; i++) {
+                columns.push(
+                    JSON.parse(allColumns[i])
+                )
+            }
+
+            $el.bootstrapTable({
+                columns: columns,
+                data: data
+            })
+        }
+
+        $(function () {
+            buildTable($table, {$columnNumber}, {$rowNumber}, 1)
+        })
+    </script>
+{/block}

@@ -1,0 +1,47 @@
+#
+# WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# https://nette.org/security-warning
+#
+parameters:
+    mailer:
+        smtp: true
+        host: smtp.mailtrap.io
+        port: 25
+        username: 291a6b5399ebe3
+        password: ff8c92f6b44315
+
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+
+
+session:
+	expiration: 14 days
+
+
+database:
+	dsn: 'mysql:host=localhost;dbname=bachelor'
+	user: root
+	password:
+	options:
+		lazy: yes
+
+
+
+services:
+	- App\Model\UserManager(%mailer%)
+	- App\Model\ExcelManager
+	- App\Model\GridManager
+	- App\Model\FormManager(%mailer%)
+	- App\Forms\FormFactory
+	- App\Forms\SignInFormFactory
+	- App\Forms\SignUpFormFactory
+	- App\Forms\UploadFormFactory
+	- App\Forms\DownloadFormFactory
+	- App\Forms\ChangePasswordFormFactory
+	- App\Forms\NewTeamFormFactory
+	- App\Forms\AddMemberFormFactory
+	- App\Forms\AddClientFormFactory
+	router: App\Router\RouterFactory::createRouter

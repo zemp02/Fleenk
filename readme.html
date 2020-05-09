@@ -1,0 +1,25 @@
+<h1 id="fleenk">Fleenk</h1>
+<p>Webová aplikace pro organizaci sběru výpočetní techniky při rozsáhlých akcích</p>
+<h2 id="o-programu">O programu</h2>
+<p>Tato práce byla vytvořena jako praktická část bakalářské práce pro Vysokou školu Ekonomickou.
+    Jedná se o aplikaci nahrazující dispečera jako informační kanál při komunikaci mezi týmy techniků a klienty.  </p>
+<h2 id="po-adavky-apliakce">Požadavky apliakce</h2>
+<ul>
+    <li>PHP 7+</li>
+    <li>Apache</li>
+    <li>SMTP server</li>
+    <li>MariaDb</li>
+    <li>Composer</li>
+</ul>
+<h2 id="instalace">Instalace</h2>
+<p>Při instalaci se předpokládá s již rozběhlými servery s veškerými požadovanými aplikacemi.</p>
+<ol>
+    <li>Pro získání knihoven spusťe composer příkazem
+        <code>$:Composer install</code></li>
+    <li>Pro propojení se SMTP serverem a Apache vyplňte konfiguraci nacházející se v common.neon</li>
+    <li>Vytvořte tabulky v databázi za pomoci kódu nalézajícím se v CreateScript.sql</li>
+    <li>Nahrajte základní hodnoty do databáze za pomoci kódu nalézajícím se v InsertScript.sql<br>Základní přihlašovací údaje pro administrátora jsou &quot;adm@adm.cz&quot; a heslo &quot;Admin&quot;.<br>Toto heslo si ihned změňte kliknutím na tlačítko s nápisem Admin.</li>
+    <li>Do šablony Template.xlsx přeneste potřebná data, a tuto šablonu následně vložte na stránce Database do aplikace.
+        Pokud jste data správně vložily, importují se do databáze.</li>
+    <li>Vaše aplikace je připravena pro použití, dočasná hesla byla automaticky zaslána uživatelům.</li>
+</ol>

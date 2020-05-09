@@ -1,0 +1,29 @@
+{block title}Database{/block}
+{block content}
+<div class="row justify-content-center mb-3">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Generate Database from excel</h5>
+
+                <p class="card-text"> Enter spreadsheet with data.<br>
+                    Spreadsheet has to follow determined structure.
+                </p>
+                {include bootstrap-form uploadForm}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mb-3">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Export Database to excel</h5>
+                <p class="card-text"> On press of this button, data from database will be exported into an excel sheet.
+                </p>
+                {include bootstrap-form downloadForm}
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
