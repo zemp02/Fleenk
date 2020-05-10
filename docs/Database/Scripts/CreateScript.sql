@@ -161,7 +161,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `bachelor`.`clientOffice` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `description` VARCHAR(255) NOT NULL,
-  `note` VARCHAR(255) NULL,
+  `note` TEXT NULL,
   `fk_Team_Id` INT NULL,
   `fk_ClientSupervisor_Id` INT NOT NULL,
   `fk_Address_Id` INT NOT NULL,
