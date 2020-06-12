@@ -33,6 +33,11 @@ Při instalaci se předpokládá s již rozběhlými servery s veškerými poža
 Changelog
 --------------
 
+### Patch-2
+
+Přidáno:
+ - Management stránka pro optimalizování vytíženosti týmů
+
 ### Patch-1
 
 Přidáno:
