@@ -3,6 +3,7 @@
 namespace App\Forms;
 
 use App\Model\ExcelManager;
+use App\Model\FileFaultException;
 use Nette;
 use Nette\Application\UI\Form;
 
@@ -61,8 +62,10 @@ final class UploadFormFactory
             $file = $values->excel;
             try {
                 $this->excelManager->importExcel($file);
+            }catch(FileFaultException $e){
+                $form->addError("Problem with inserted file!\r\n Sheet: ". $e->getSheet().",\r\n Line: ".$e->getSheetLine().".");
             }catch(\Exception $e){
-                $form->addError("Problem with inserted file!\r\n". $e->getMessage().' | ');
+                $form->addError("There was a problem during file insertion, please try again.");
             }
 
         } else {

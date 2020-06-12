@@ -6,6 +6,7 @@ use Nette;
 use Nette\Security\Passwords;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Throwable;
 
 /**
  * Class ExcelManager
@@ -59,34 +60,50 @@ final class ExcelManager
         $rowValue = $this->createTechnicianArray($spreadsheet, $startCoord);
 
         while (!is_null($rowValue['email'])) {
-            $startCoord++;
-            $this->insertTechnician($rowValue);
-            $rowValue = $this->createTechnicianArray($spreadsheet, $startCoord);
+            try {
+                $startCoord++;
+                $this->insertTechnician($rowValue);
+                $rowValue = $this->createTechnicianArray($spreadsheet, $startCoord);
+            }catch(\Exception $e){
+                throw new FileFaultException($e->getMessage(),$e->getCode(),null,'Technici',$startCoord);
+            }
 
         }
 
         $startCoord = 2;
         $rowValue = $this->createTeamArray($spreadsheet, $startCoord);
         while (!is_null($rowValue['name'])) {
+            try{
             $startCoord++;
             $this->insertTeam($rowValue);
             $rowValue = $this->createTeamArray($spreadsheet, $startCoord);
+            }catch(\Exception $e){
+                throw new FileFaultException($e->getMessage(),$e->getCode(),null,'Týmy',$startCoord);
+            }
         }
 
         $startCoord = 2;
         $rowValue = $this->createClientArray($spreadsheet, $startCoord);
         while (!is_null($rowValue['email'])) {
+            try{
             $startCoord++;
             $this->insertClient($rowValue);
             $rowValue = $this->createClientArray($spreadsheet, $startCoord);
+            }catch(\Exception $e){
+                throw new FileFaultException($e->getMessage(),$e->getCode(),null,'Klienti',$startCoord);
+            }
         }
 
         $startCoord = 2;
         $rowValue = $this->createLocationArray($spreadsheet, $startCoord);
         while (!is_null($rowValue['id'])) {
-            $startCoord++;
-            $this->insertLocation($rowValue);
-            $rowValue = $this->createLocationArray($spreadsheet, $startCoord);
+            try {
+                $startCoord++;
+                $this->insertLocation($rowValue);
+                $rowValue = $this->createLocationArray($spreadsheet, $startCoord);
+            }catch(\Exception $e){
+                throw new FileFaultException($e->getMessage(),$e->getCode(),null,'Lokace',$startCoord);
+            }
         }
 
         return $rowValue;
@@ -514,4 +531,44 @@ final class ExcelManager
     }
 
 
+}
+
+/**
+ * Class FileFaultException - Exception warning about incorrect role of requested user.
+ * @package App\Model
+ */
+class FileFaultException extends \Exception
+{
+    /** variable defining on what sheet is error
+     * @var $sheet defines sheet on which is error
+     */
+    private $sheet;
+
+    /** variable defining on what line is error
+     * @var $sheet defines line where is error
+     */
+    private $sheetLine;
+
+    public function __construct(string $message = "", int $code = 0, Throwable $previous = null,string $sheet,int $sheetLine)
+    {
+        parent::__construct($message, $code, $previous);
+        $this->sheet = $sheet;
+        $this->sheetLine=$sheetLine;
+    }
+
+    /** Returns value of sheet
+     * @return value of sheet
+     */
+    public function getSheet(): string
+    {
+        return $this->sheet;
+    }
+
+    /** Returns value of line
+     * @return value of line
+     */
+    public function getSheetLine(): int
+    {
+        return $this->sheetLine;
+    }
 }

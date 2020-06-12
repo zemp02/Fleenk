@@ -16,6 +16,9 @@ class Bootstrap
 		$configurator->setTimeZone('Europe/Prague');
 		$configurator->setTempDirectory(__DIR__ . '/../temp');
 
+        $configurator->setDebugMode(false);
+        $configurator->enableTracy(__DIR__ . '/../log');
+
 		$configurator->createRobotLoader()
 			->addDirectory(__DIR__)
 			->register();

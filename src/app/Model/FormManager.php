@@ -248,6 +248,32 @@ final class FormManager
         return true;
     }
 
+    /** Creates a list of technicians that are not assigned to team.
+     */
+    public function getAssignableTechnicians(){
+        $assignableTechnicians=[];
+        $technicians = $this->database->table('technician')->where('fk_Team_Id',null)->fetchAll();
+        foreach ($technicians as $technician){
+            $user = $this->database->table('user')->where('fk_Technician_Id=?',$technician->id)->fetch();
+            array_push($assignableTechnicians,$user->email);
+        }
+        return $assignableTechnicians;
+    }
+
+    /** Creates a list of technicians that are not assigned to team.
+     */
+    public function getAssignableBranches(){
+        $assignableBranches=[];
+        $branches = $this->database->table('clientOffice')->where('fk_Team_Id',null)->fetchAll();
+        foreach ($branches as $branch){
+            array_push($assignableBranches,[
+                "code"=>$branch->id,
+                "description"=>$branch->description
+            ]);
+        }
+        return $assignableBranches;
+    }
+
 
 }
 

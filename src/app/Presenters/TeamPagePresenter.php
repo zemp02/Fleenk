@@ -90,6 +90,8 @@ final class TeamPagePresenter extends BasePresenter
         $this->template->branchRows = $branchRows;
         $this->template->memberColumnNumber = sizeof($memberColumns);
         $this->template->branchColumnNumber = sizeof($branchColumns);
+        $this->template->technicianList = $this->formManager->getAssignableTechnicians();
+        $this->template->branchList = $this->formManager->getAssignableBranches();
 
     }
 

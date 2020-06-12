@@ -24,7 +24,14 @@
                             <div class="col">
                                 <div class="row">
                                     <div class="col input-group ">
-                                        <input n:name=member class="form-control" placeholder="New member's email: ">
+                                        <input n:name=member class="form-control flexdatalist" placeholder="New member's email: "
+                                                             data-min-length='1'
+                                                             list='technicianList'
+                                                             input="text"
+                                                             data-value-property='value'
+                                        >
+                                        <datalist id="technicianList">
+                                        </datalist>
                                         <div class="input-group-append">
                                             <input n:name=add class="btn btn-primary">
                                         </div>
@@ -48,7 +55,13 @@
                             <div class="col">
                                 <div class="row">
                                     <div class="col input-group ">
-                                        <input n:name=branch class="form-control " placeholder="Code of branch: ">
+                                        <input n:name=branch class="form-control flexdatalist" placeholder="Code of branch: "
+                                                             data-min-length='1'
+                                                             list='branchList'
+                                                             input="text"
+                                                             data-value-property='value'>
+                                        <datalist id="branchList">
+                                        </datalist>
                                         <div class="input-group-append">
                                             <input n:name=add class="btn btn-primary">
                                         </div>
@@ -104,8 +117,31 @@
 {/block}
 {block bonusScripts}
     <script>
-        let $members = $('#members')
-        let $branches = $('#branches')
+        let $members = $('#members');
+        let $branches = $('#branches');
+
+        let technicianList={$technicianList};
+        let branchList={$branchList};
+
+        $('.flexdatalist').flexdatalist({
+            minLength: 1,
+            valueProperty: 'value',
+        });
+
+        technicianList.forEach(function (technician){
+            datalist=document.getElementById('technicianList');
+            option = document.createElement( 'option' );
+            option.value = option.text =  technician;
+            datalist.appendChild( option );
+        });
+
+        branchList.forEach(function (branch){
+            datalist=document.getElementById('branchList');
+            option = document.createElement( 'option' );
+            option.text =  branch.description;
+            option.value = branch.code;
+            datalist.appendChild( option );
+        });
 
         /**
          * Function that creates primary table
@@ -169,7 +205,7 @@
                 let id = $(this).attr('data-id');
                 let index = $(this).closest('tr').data('index');
 
-                let res = confirm("Opravdu chcete změnit stav?");
+                let res = confirm("Are you sure you want to unassign this from this team?");
 
                 if (!res) {
                     return;
@@ -185,14 +221,15 @@
 
                     },
                     success: function (data) {
-                        if (input == 'member') {
+                        window.location.reload();
+                        /*if (input == 'member') {
                             $el.bootstrapTable('remove', { field: 'MemberEmail', values: rowData[index].MemberEmail});
                         } else if (input == 'branch') {
                             $el.bootstrapTable('remove', {
                                 field: 'BranchCode',
                                 values: rowData[index].BranchCode.toString()
                             });
-                        }
+                        }*/
                     }
 
                 });

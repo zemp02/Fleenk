@@ -1,9 +1,9 @@
 
-INSERT INTO `userrole`(`id`, `name`) VALUES (1,'Admin');
-INSERT INTO `userrole`(`id`, `name`) VALUES (2,'Technik');
-INSERT INTO `userrole`(`id`, `name`) VALUES (3,'Klient');
+INSERT INTO `userRole`(`id`, `name`) VALUES (1,'Admin');
+INSERT INTO `userRole`(`id`, `name`) VALUES (2,'Technik');
+INSERT INTO `userRole`(`id`, `name`) VALUES (3,'Klient');
 
-INSERT INTO `officestate` (`id`, `name`) VALUES
+INSERT INTO `officeState` (`id`, `name`) VALUES
 (4, 'Collected'),
 (3, 'Ready for Pickup'),
 (2, 'In use'),

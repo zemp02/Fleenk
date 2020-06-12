@@ -25,6 +25,8 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
     <link rel="stylesheet" href="{$basePath}/css/style.css">
+    <link rel="stylesheet" href="{$basePath}/css/jquery.flexdatalist.min.css" type="text/css">
+
 
 
     {block head}{/block}
@@ -37,12 +39,10 @@
         {block navbar}
             <div class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
                 <span class="navbar-brand">Fleenk</span>
-                    {if $role == 'Admin'}
                         <button class="navbar-toggler" type="button" data-toggle="collapse"
                                 data-target="#navbar-collapse">
                             <span class="navbar-toggler-icon"></span>
                         </button>
-                    {/if}
                 <div class="collapse navbar-collapse" id="navbar-collapse">
                         {if $role == 'Admin'}
                             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
@@ -96,6 +96,7 @@
     <script src="{$basePath}/js/main.js"></script>
     <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
     <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/extensions/mobile/bootstrap-table-mobile.min.js"></script>
+    <script src="{$basePath}/js/jquery.flexdatalist.min.js"></script>
     {ifset bonusScripts}{include bonusScripts}{/ifset}
 {/block}
 </body>

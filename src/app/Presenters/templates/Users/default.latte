@@ -157,7 +157,7 @@
             let $el = $(this).closest('table');
             let email = $el.bootstrapTable('getData')[index].technicianEmail;
 
-            let res = confirm("Opravdu chcete vymazat tohoto uživatele?");
+            let res = confirm("Are you sure you want to delete this user?");
 
             if (!res) {
                 return;
@@ -189,7 +189,7 @@
             e.stopPropagation();
 
             let id = $(this).attr('data-id');
-            let res = confirm("Opravdu chcete resetovat heslo tohoto uživatele?");
+            let res = confirm("Are you sure you want to reset password of this user?");
 
             if (!res) {
                 return;
