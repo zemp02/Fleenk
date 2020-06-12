@@ -28,3 +28,20 @@ Při instalaci se předpokládá s již rozběhlými servery s veškerými poža
  1. Do šablony Template.xlsx přeneste potřebná data, a tuto šablonu následně vložte na stránce Database do aplikace. 
  Pokud jste data správně vložily, importují se do databáze.
  1. Vaše aplikace je připravena pro použití, dočasná hesla byla automaticky zaslána uživatelům.
+
+
+Changelog
+--------------
+
+### Patch-1
+
+Přidáno:
+ - Našeptávač Flex-Datalist pro stránky týmů
+ - Pokročilejší hlášení chyb při vkládání dat z Excelu
+
+Opraveno:
+- Nefunkční dropdown navigační menu pro Klienta a Technika
+ - Chybná chybová hláška při vkládání nových dat z Excelu
+ - Jazyková nekonzistence vyskakovacích oken.
+ - Chybějící adresáře log a temp
+ - Chybný CamelCase v InsertScriptu
