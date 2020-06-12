@@ -128,14 +128,14 @@ final class GridManager
   <label for="roleList">Select list:</label>
   <select class="form-control opt-select-state" id="roleList">';
                 foreach ($states as $state) {
-                    $branchStateId =$branch->fk_OfficeState_Id->id + 1;
-                    $stateId =$state->id;
-                    if( $branchStateId == $stateId ){
+                    $branchStateId = $branch->fk_OfficeState_Id->id + 1;
+                    $stateId = $state->id;
+                    if ($branchStateId == $stateId) {
                         $select = 'selected';
-                    }else{
+                    } else {
                         $select = '';
                     }
-                    $option = '<option ' . $select. ' >' . $state->name . '</option >';
+                    $option = '<option ' . $select . ' >' . $state->name . '</option >';
                     $selectButton .= $option;
 
                 }
@@ -253,6 +253,81 @@ final class GridManager
         }
         return $rows;
     }
+
+    /** Provides presenter with data for the free Technicians table on Management page.
+     * @return array array of table data encoded in JSON.
+     */
+    public function getFreeTechnicianData()
+    {
+
+        $rows = [];
+        $technicians = $this->database->table('technician')->where('fk_Team_Id', null)->fetchAll();
+        foreach ($technicians as $technician) {
+            $user = $this->database->table('user')->where('fk_Technician_Id=?', $technician->id)->fetch();
+            array_push($rows, json_encode([
+                'TechnicianFirstName' => $user->firstName,
+                'TechnicianLastName' => $user->lastName,
+                'TechnicianEmail' => $user->email,
+                'TechnicianPhone' => $user->technician->phone,
+            ]));
+        }
+        return $rows;
+    }
+
+    /** Provides presenter with data for the free Branch table on Management Page.
+     * @return array array of table data encoded in JSON.
+     */
+    public function getFreeBranchData()
+    {
+        $rows = [];
+
+        $freeBranches = $this->database->table('clientOffice')->where('fk_Team_Id', null)->fetchAll();
+        foreach ($freeBranches as $freeBranch) {
+            $officeContact = $this->database->table('officeContact')
+                ->where('fk_ClientOffice_Id = ?', $freeBranch->id)->fetch();
+            array_push($rows, json_encode([
+                'BranchCode' => $freeBranch->id,
+                'BranchAddress' => $freeBranch->address->streetName . ' ' . $freeBranch->address->streetNumber,
+                'BranchDescription' => $freeBranch->description,
+                'BranchLeader' => $officeContact->firstName . ' ' . $officeContact->lastName,
+                'BranchLeaderPhone' => $officeContact->phone,
+                'State' => $freeBranch->officeState->name,
+            ]));
+        }
+
+
+        return $rows;
+    }
+
+    /** Provides presenter with data for the Management Load table.
+     * @return array array of table data encoded in JSON.
+     */
+    public function getTeamLoadData($high)
+    {
+        $rows = [];
+        $sQLWrapper = ($high)?'COUNT(:clientOffice.id) >= 5 ':'COUNT(:clientOffice.id) <= 2';
+        $teams = $this->database->table('team')
+            ->group('team.id')
+            ->having($sQLWrapper)
+            ->fetchAll();
+
+        foreach ($teams as $team) {
+            $teamLeader = $this->database->table('user')
+                ->where('fk_Technician_Id = ?', $team->fk_TeamLeaderTechnician_Id)
+                ->fetch();
+            array_push($rows, json_encode([
+                'TeamName' => $team->name,
+                'LeaderName' => $teamLeader->firstName . ' ' . $teamLeader->lastName,
+                'LeaderPhone' => $teamLeader->technician->phone,
+                'teamPage' => '<a class="btn btn-primary btn-team-page" href="' . $this->linkGenerator->link('TeamPage:default', [$team->id]) . '">Team Page</a>'
+            ]));
+
+        }
+        return $rows;
+    }
+
+
+
 
     /** Provides presenter with data for the Client table on User page.
      * @return array array of table data encoded in JSON.

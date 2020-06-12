@@ -1,0 +1,153 @@
+{block title}TeamPage{/block}
+{block content}
+    <div class="container col">
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>Free Technicians:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="freeTechnicians" class="table"
+                           data-show-pagination-switch="true"
+                           data-pagination="true"
+                    >
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>Branches without Team:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="freeBranches" class="table"
+                           data-show-pagination-switch="true"
+                           data-pagination="true"
+                    >
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>Less than 2 Branches:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="lowTeam" class="table"
+                           data-show-pagination-switch="true"
+                           data-pagination="true"
+                    >
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start mb-3 p-0">
+                <h3>More than 5 Branches:</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col p-0">
+                <div class="table-responsive">
+                    <table id="highTeam" class="table"
+                           data-show-pagination-switch="true"
+                           data-pagination="true"
+                    >
+                        <thead class="thead-dark">
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{/block}
+{block bonusScripts}
+    <script>
+        let $freeTech = $('#freeTechnicians');
+        let $freeBranches = $('#freeBranches');
+        let $lowTeam = $('#lowTeam')
+        let $highTeam = $('#highTeam')
+
+        /**
+         * Function that creates primary table
+         */
+        function buildTable($el, input) {
+            let columns = [];
+            let rowData = [];
+            let allColumns = [];
+            let row = [];
+            let columnNumber;
+
+            if (input === 'freeTech') {
+                allColumns={$freeTechnicianColumns};
+                columnNumber ={$freeTechnicianColumnNumber};
+                row = {$freeTechnicianRows};
+            } else if (input === 'freeBranch') {
+                allColumns = {$freeBranchColumns};
+                columnNumber ={$freeBranchColumnNumber};
+                row = {$freeBranchRows};
+            } else if (input === 'lowTeam') {
+                allColumns ={$TeamColumns};
+                columnNumber ={$TeamColumnNumber};
+                row = {$lowLoadRows};
+            } else if (input === 'highTeam') {
+                allColumns ={$TeamColumns};
+                columnNumber ={$TeamColumnNumber};
+                row = {$highLoadRows};
+            }
+
+
+            /**
+             * If there are any rows in JSON adds them to data array.
+             */
+
+            row.forEach(function (item) {
+                rowData.push(JSON.parse(item));
+            });
+
+
+            /**
+             * Sets up columns for primary row
+             */
+
+            for (i = 0; i < columnNumber; i++) {
+                columns.push(
+                    JSON.parse(allColumns[i])
+                )
+            }
+            /**
+             * Creates primary table
+             */
+            $el.bootstrapTable({
+                columns: columns,
+                data: rowData
+            });
+
+        }
+
+
+        $(function () {
+            buildTable($freeTech, 'freeTech');
+            buildTable($freeBranches, 'freeBranch');
+            buildTable($lowTeam, 'lowTeam');
+            buildTable($highTeam, 'highTeam');
+        })
+    </script>
+{/block}
