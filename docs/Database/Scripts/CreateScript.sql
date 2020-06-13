@@ -1,3 +1,5 @@
+# noinspection SqlNoDataSourceInspectionForFile
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -116,9 +118,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bachelor`.`Janitor`
+-- Table `bachelor`.`janitor`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bachelor`.`Janitor` (
+CREATE TABLE IF NOT EXISTS `bachelor`.`janitor` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `phone` VARCHAR(20) NOT NULL,
   PRIMARY KEY (`id`),
@@ -133,13 +135,13 @@ CREATE TABLE IF NOT EXISTS `bachelor`.`address` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `streetName` VARCHAR(100) NOT NULL,
   `streetNumber` VARCHAR(25) NOT NULL,
-  `Janitor_id` INT NOT NULL,
+  `janitor_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `idCO_UNIQUE` (`id` ASC) ,
-  INDEX `fk_address_Janitor1_idx` (`Janitor_id` ASC) ,
+  INDEX `fk_address_Janitor1_idx` (`janitor_id` ASC) ,
   CONSTRAINT `fk_address_Janitor1`
-    FOREIGN KEY (`Janitor_id`)
-    REFERENCES `bachelor`.`Janitor` (`id`)
+    FOREIGN KEY (`janitor_id`)
+    REFERENCES `bachelor`.`janitor` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

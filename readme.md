@@ -20,6 +20,8 @@ Instalace
 Při instalaci se předpokládá s již rozběhlými servery s veškerými požadovanými aplikacemi.
  1. Pro získání knihoven spusťe composer příkazem 
  `$:Composer install`
+ 1. Ujistěte se že PHP má možnost psát do složek temp a log. Na centos linux napřiklad je zapotřebí provést tyto příkazy:
+ `$:chcon -t /PathToFile/Fleenk/src/log/ -R` a `/var/www/html/Fleenk/src/temp/ -R`
  1. Pro propojení se SMTP serverem a Apache vyplňte konfiguraci nacházející se v common.neon
  1. Vytvořte tabulky v databázi za pomoci kódu nalézajícím se v CreateScript.sql
  1. Nahrajte základní hodnoty do databáze za pomoci kódu nalézajícím se v InsertScript.sql  
