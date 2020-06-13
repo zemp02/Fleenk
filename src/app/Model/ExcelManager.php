@@ -347,7 +347,7 @@ final class ExcelManager
         /**
          * Janitor check/insert
          */
-        $janitorCheck = $this->database->table('Janitor')
+        $janitorCheck = $this->database->table('janitor')
             ->select('id')
             ->where('phone = ?', $rowValue['janitorPhone'])
             ->fetch();
